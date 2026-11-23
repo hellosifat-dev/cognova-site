@@ -3,45 +3,118 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CogNova 3.0 — a Bangla-first language model, built from scratch</title>
-<meta name="description" content="CogNova 3.0 is a research project from SyncAura to build a Bangla, English and code language model from the ground up, with a custom tokenizer, a verified transformer and evidence-backed training gates. Built by Sifat Ahmed.">
-<meta property="og:title" content="CogNova 3.0 — a language model, built from scratch">
-<meta property="og:description" content="Tokenizer, model and training loop written from zero, checked at every step. Research by SyncAura.">
+<title>CogNova 3.0 — research toward a Bangla-first language model</title>
+<meta name="description" content="CogNova 3.0 is an independent AI research project by Sifat Ahmed at SyncAura: building a Bangla, English and code language model from the first byte, with every experiment declared in advance and every result written down, including the ones that did not pass.">
+<meta property="og:title" content="CogNova 3.0 — research toward a Bangla-first language model">
+<meta property="og:description" content="Tokenizer, transformer and training loop written from zero. Six evidence-gated experiments so far, with honest limits. Research by SyncAura.">
 <meta name="theme-color" content="#4338ca">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%234338ca'/%3E%3Ccircle cx='16' cy='16' r='4' fill='white'/%3E%3Ccircle cx='8' cy='9' r='2.2' fill='white'/%3E%3Ccircle cx='24' cy='9' r='2.2' fill='white'/%3E%3Ccircle cx='8' cy='23' r='2.2' fill='white'/%3E%3Ccircle cx='24' cy='23' r='2.2' fill='white'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="base.css">
 <style>
-  :root { --accent: #4338ca; --accent-2: #0891b2; --accent-ink: #fff; }
+  :root { --accent: #4338ca; --accent-2: #0891b2; --accent-ink: #fff; --serif: 'Source Serif 4', Georgia, serif; }
   :root[data-theme="dark"] { --accent: #a5b4fc; --accent-2: #67e8f9; --accent-ink: #14143a; }
   .logo-mark { width: 30px; height: 30px; border-radius: 9px; background: #4338ca; color: #fff; display: grid; place-items: center; }
   .logo-mark svg { width: 17px; height: 17px; }
-  .term { border-radius: 16px; background: #15161c; color: #d8dae3; box-shadow: var(--shadow-lg); overflow: hidden; border: 1px solid #262833; }
-  .term .frame-bar { background: #1d1f27; border-bottom: 1px solid #262833; }
-  .term .frame-bar span { color: #8b8fa3; }
-  @media (max-width: 620px) { .term pre { font-size: 11px; padding: 16px; } }
-  .term pre { margin: 0; padding: 22px 24px 26px; font: 13.5px/1.75 var(--mono); overflow-x: auto; white-space: pre; }
-  .term .k { color: #8b8fa3; } .term .g { color: #6ee7b7; } .term .b { color: #a5b4fc; } .term .y { color: #fcd34d; }
-  .model { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: 15px; }
-  .model td { padding: 13px 18px; border-bottom: 1px solid var(--line-2); }
-  .model tr:last-child td { border-bottom: 0; }
-  .model td:first-child { color: var(--muted); width: 46%; }
-  .model td:last-child { font-family: var(--mono); font-size: 14px; }
-  .bars { display: grid; gap: 22px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
-  .bar-row h4 { margin: 0 0 10px; font-size: 15.5px; }
-  .bar { display: grid; grid-template-columns: 64px 1fr 64px; gap: 12px; align-items: center; font: 12.5px var(--mono); color: var(--muted); margin-top: 6px; }
-  .bar i { display: block; height: 12px; border-radius: 6px; background: var(--line); }
-  .bar i.after { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
-  .bar b { font-weight: 500; color: var(--ink); text-align: right; }
-  .results { display: grid; grid-template-columns: 1fr 1.25fr; gap: 24px; align-items: start; }
-  @media (max-width: 880px) { .results { grid-template-columns: 1fr; } }
-  .principles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-  @media (max-width: 760px) { .principles { grid-template-columns: 1fr; } }
-  .principle { display: flex; gap: 16px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
-  .principle h4 { font-size: 16.5px; margin: 0 0 4px; }
-  .principle p { margin: 0; font-size: 14.5px; color: var(--ink-2); }
-  @media (max-width: 900px) { .flow { grid-template-columns: 1fr !important; } .flow > div + div { border-left: 1px solid var(--line); border-top: 0; } .flow > div:first-child { border-radius: var(--radius) var(--radius) 0 0; } .flow > div:last-child { border-radius: 0 0 var(--radius) var(--radius); } }
+
+  /* Paper-style hero */
+  .paper-hero { padding: 64px 0 40px; max-width: 900px; }
+  .paper-hero h1 { font-family: var(--serif); font-weight: 600; letter-spacing: -.02em; font-size: clamp(36px, 5.4vw, 62px); line-height: 1.08; margin: 18px 0 18px; }
+  .paper-hero h1 em { font-style: italic; color: var(--accent); }
+  .byline { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 14.5px; color: var(--muted); margin-bottom: 28px; }
+  .byline b { color: var(--ink); font-weight: 600; }
+  .abstract { font-family: var(--serif); font-size: 18.5px; line-height: 1.7; color: var(--ink-2); padding: 26px 28px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 var(--radius) var(--radius) 0; box-shadow: var(--shadow); }
+  .abstract .label { display: block; font: 600 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .abstract p { margin: 0; }
+  .keywords { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .keywords span { font: 12.5px var(--mono); padding: 5px 10px; border-radius: 6px; border: 1px solid var(--line); color: var(--ink-2); background: var(--bg); }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 26px; font: 13.5px var(--mono); }
+  .toc a { color: var(--muted); text-decoration: none; }
+  .toc a:hover { color: var(--accent); }
+  .toc a b { color: var(--accent); font-weight: 500; margin-right: 6px; }
+
+  h2.serif, .section-head h2 { font-family: var(--serif); font-weight: 600; letter-spacing: -.015em; }
+  .sec-num { font: 500 13px var(--mono); color: var(--accent); }
+
+  /* Research questions */
+  .rq { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 800px) { .rq { grid-template-columns: 1fr; } }
+  .rq div { padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .rq .q { font: 600 13px var(--mono); color: var(--accent); }
+  .rq h3 { font-family: var(--serif); font-size: 20px; font-weight: 600; margin: 8px 0 8px; line-height: 1.35; }
+  .rq p { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+
+  /* Method cycle */
+  .cycle { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow: hidden; }
+  .cycle > div { padding: 22px 20px; border-right: 1px solid var(--line-2); position: relative; }
+  .cycle > div:last-child { border-right: 0; }
+  .cycle b { display: block; font: 500 12px var(--mono); color: var(--accent); margin-bottom: 8px; }
+  .cycle h4 { margin: 0 0 6px; font-size: 16px; }
+  .cycle p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+  @media (max-width: 900px) { .cycle { grid-template-columns: 1fr; } .cycle > div { border-right: 0; border-bottom: 1px solid var(--line-2); } .cycle > div:last-child { border-bottom: 0; } }
+
+  /* Experiments */
+  .exp-list { display: grid; gap: 18px; }
+  .exp { display: grid; grid-template-columns: 220px 1fr; gap: 28px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+  @media (max-width: 820px) { .exp { grid-template-columns: 1fr; gap: 14px; padding: 22px; } }
+  .exp-meta .id { font: 600 34px/1 var(--display); letter-spacing: -.03em; color: var(--accent); }
+  .exp-meta .date { display: block; margin: 10px 0 12px; font: 12.5px var(--mono); color: var(--muted); }
+  .exp h3 { font-family: var(--serif); font-size: 22px; font-weight: 600; margin: 0 0 8px; }
+  .exp > div > p { margin: 0 0 14px; color: var(--ink-2); font-size: 15px; }
+  .exp dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; margin: 0; font-size: 14px; }
+  .exp dt { color: var(--muted); font: 12.5px var(--mono); padding-top: 2px; }
+  .exp dd { margin: 0; }
+  .result-tag { display: inline-block; margin-top: 14px; font: 500 12.5px var(--mono); padding: 6px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); }
+  .result-tag.warn { background: color-mix(in srgb, #e09a0c 14%, transparent); color: #a86200; }
+  :root[data-theme="dark"] .result-tag.warn { color: #f5c063; }
+
+  /* Figures */
+  .figs { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 900px) { .figs { grid-template-columns: 1fr; } }
+  figure { margin: 0; padding: 24px; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { margin-top: 14px; font-family: var(--serif); font-size: 14.5px; color: var(--ink-2); line-height: 1.55; }
+  figcaption b { font-family: var(--body); color: var(--ink); }
+  .chart text { font-family: 'IBM Plex Mono', monospace; font-size: 11px; fill: var(--muted); }
+  .chart .lbl { fill: var(--ink); font-size: 12px; }
+  .chart .grid { stroke: var(--line-2); }
+  .chart .before { fill: var(--line); }
+  .chart .after { fill: var(--accent); }
+  .chart .after2 { fill: var(--accent-2); }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font: 12px var(--mono); color: var(--muted); }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+  /* Tables */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .tbl-wrap { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); overflow-x: auto; }
+  .tbl th, .tbl td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
+  .tbl th { font: 500 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: var(--bg-2); }
+  .tbl tr:last-child td { border-bottom: 0; }
+  .tbl td.num { font-family: var(--mono); font-size: 13.5px; text-align: right; }
+  .tbl th.num { text-align: right; }
+  .pass { color: #17804f; font-weight: 600; } :root[data-theme="dark"] .pass { color: #4ade80; }
+  .open { color: #a86200; font-weight: 600; } :root[data-theme="dark"] .open { color: #f5c063; }
+
+  /* Findings */
+  .findings { counter-reset: f; display: grid; gap: 14px; }
+  .finding { display: grid; grid-template-columns: 46px 1fr; gap: 16px; padding: 22px 24px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+  .finding::before { counter-increment: f; content: counter(f); width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; font: 600 15px var(--display); color: var(--accent-ink); background: var(--accent); }
+  .finding h4 { margin: 4px 0 6px; font-size: 17px; }
+  .finding p { margin: 0; font-size: 14.5px; color: var(--ink-2); }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .two-col > *, .figs > * { min-width: 0; }
+  @media (max-width: 900px) { .two-col { grid-template-columns: 1fr; } }
+  .limits { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .limits li { display: flex; gap: 12px; font-size: 14.5px; color: var(--ink-2); padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+  .limits svg { flex: none; width: 18px; height: 18px; color: var(--muted); margin-top: 2px; }
+
+  .cite { position: relative; }
+  .cite pre { margin: 0; padding: 22px 24px; border-radius: var(--radius); background: #15161c; color: #d8dae3; font: 13px/1.7 var(--mono); overflow-x: auto; border: 1px solid #262833; }
+  .cite .k { color: #a5b4fc; } .cite .s { color: #6ee7b7; }
+  .copy { position: absolute; top: 12px; right: 12px; font: 500 12px var(--mono); padding: 6px 10px; border-radius: 8px; border: 1px solid #343745; background: #1d1f27; color: #c9cbd6; cursor: pointer; }
+  .copy:hover { color: #fff; }
 </style>
 <script src="base.js"></script>
 </head>
@@ -105,178 +178,271 @@
   <div class="wrap">
     <a class="brand" href="#top" aria-label="CogNova home"><span class="logo-mark"><svg><use href="#i-sparkle"/></svg></span>CogNova 3.0</a>
     <nav class="nav-links" aria-label="Main">
-      <a href="#approach">Approach</a>
-      <a href="#pipeline">Pipeline</a>
-      <a href="#results">Results</a>
-      <a href="#roadmap">Roadmap</a>
+      <a href="#questions">Questions</a>
+      <a href="#method">Method</a>
+      <a href="#experiments">Experiments</a>
+      <a href="#findings">Findings</a>
+      <a href="#next">Next</a>
     </nav>
     <div class="nav-end">
       <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch light or dark theme"><svg class="sun"><use href="#i-sun"/></svg><svg class="moon"><use href="#i-moon"/></svg></button>
-      <a class="btn btn-primary btn-sm" href="#results">See results</a>
+      <a class="btn btn-primary btn-sm" href="#experiments">Read the results</a>
       <button class="icon-btn menu-btn" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false"><svg><use href="#i-menu"/></svg></button>
     </div>
   </div>
 </header>
 
 <main id="main">
-  <div class="hero wrap" id="top">
-    <span class="pill reveal"><span class="dot"></span>Research alpha · by SyncAura</span>
-    <h1 class="reveal">A language model, <span class="accent">built from the first byte.</span></h1>
-    <p class="lead reveal">CogNova 3.0 is an effort to build a Bangla, English and code language model from scratch: our own tokenizer, our own transformer and our own training loop. Every step is small, measured and written down before the next one starts.</p>
-    <div class="hero-cta reveal">
-      <a class="btn btn-primary" href="#pipeline">How it is built <svg><use href="#i-arrow"/></svg></a>
-      <a class="btn btn-ghost" href="#results">Training results</a>
-    </div>
-    <div class="hero-meta reveal"><span>Bangla · English · code</span><span>PyTorch on one RTX 3050</span><span>Byte-level BPE</span><span>Evidence-gated milestones</span></div>
-    <div class="hero-shot reveal">
-      <div class="term"><div class="frame-bar"><i></i><i></i><i></i><span>cognova · T0 bounded training run</span></div>
-<pre><span class="k">$</span> python -m training.t0 --protocol T0 --device cuda
-<span class="k">device</span>      NVIDIA GeForce RTX 3050 6GB · torch 2.13 · CUDA 12.6
-<span class="k">model</span>       C0 · <span class="b">1,328,256</span> params · 4 blocks · d=128 · 4 heads · ctx 128
-<span class="k">data</span>        D1 synthetic · 24 fixtures (8 bn / 8 en / 8 code) · split 18/3/3
-
-<span class="k">step</span>    0   train loss <span class="y">6.312</span>   ppl 551
-<span class="k">step</span>  120   train loss <span class="g">2.281</span>   ppl <span class="g">9.78</span>
-<span class="k">overfit</span>     tiny batch 6.268 → <span class="g">0.506</span>   300 updates in 9.7 s
-<span class="k">replay</span>      checkpoint resume · max difference <span class="g">0</span>  ✓ exact match
-<span class="k">tests</span>       <span class="g">73 passed</span></pre>
+  <div class="wrap" id="top">
+    <div class="paper-hero">
+      <span class="pill reveal"><span class="dot"></span>Research report · alpha · updated October 2026</span>
+      <h1 class="reveal">Building a Bangla-first language model <em>from the first byte</em></h1>
+      <div class="byline reveal"><span><b>Sifat Ahmed</b></span><span>SyncAura Research</span><span>Dhaka, Bangladesh</span><span>Started 10 October 2026</span></div>
+      <div class="abstract reveal">
+        <span class="label">Abstract</span>
+        <p>CogNova 3.0 asks whether a small team, on one consumer graphics card, can build a useful language model for Bangla, English and code without starting from someone else's weights. We write the tokenizer, the transformer and the training loop ourselves, and treat every step as an experiment: the expected result is written down first, the run is bounded, and the actual result is recorded next to it, including when it falls short. Six experiments are complete. A 1.33M-parameter reference model trains stably, overfits a tiny batch on purpose, and resumes from a checkpoint with zero numerical difference. Our audit of real Wikipedia text showed what the next model needs: context chunking, stronger cleaning and record-level rights clearance before any real training starts.</p>
       </div>
+      <div class="keywords reveal"><span>language modelling</span><span>Bangla NLP</span><span>byte-level BPE</span><span>transformers</span><span>reproducibility</span><span>data provenance</span></div>
+      <nav class="toc reveal" aria-label="Contents"><a href="#questions"><b>1</b>Research questions</a><a href="#method"><b>2</b>Method</a><a href="#experiments"><b>3</b>Experiments</a><a href="#figures"><b>4</b>Figures</a><a href="#findings"><b>5</b>Findings</a><a href="#limits"><b>6</b>Limits</a><a href="#next"><b>7</b>Next</a></nav>
     </div>
-  </div>
 
-  <div class="wrap" style="margin-top:20px">
-    <div class="stats reveal">
+    <div class="stats reveal" style="margin-bottom:24px">
+      <div class="stat"><b>6</b><span>experiments, each declared before it ran</span></div>
       <div class="stat"><b>1.33M</b><span>parameters in the C0 reference model</span></div>
-      <div class="stat"><b>551 → 9.8</b><span>perplexity over 120 training steps</span></div>
-      <div class="stat"><b>10,000</b><span>tokenizer roundtrip probes, all exact</span></div>
-      <div class="stat"><b>73</b><span>automated tests passing</span></div>
+      <div class="stat"><b>0</b><span>difference after checkpoint replay</span></div>
+      <div class="stat"><b>85</b><span>automated tests passing</span></div>
     </div>
   </div>
 
-  <section id="approach">
+  <section id="questions">
     <div class="wrap">
       <div class="section-head reveal">
-        <span class="eyebrow">Why build from scratch</span>
-        <h2>Understand every layer before scaling any of it.</h2>
-        <p>Most Bangla AI products wrap a model someone else trained. CogNova goes the long way round, so the team knows exactly what the model sees, how it learns and where it breaks.</p>
+        <span class="sec-num">§1</span> <span class="eyebrow">Research questions</span>
+        <h2>What we are trying to find out.</h2>
+        <p>Many Bangla language tools today are fine-tuned from models trained mostly on English. CogNova starts from the other end.</p>
       </div>
-      <div class="grid g3">
-        <div class="card reveal"><div class="ico"><svg><use href="#i-lang"/></svg></div><h3>Bangla first</h3><p>The tokenizer and the data plan treat Bangla as a first-class language next to English and source code, not an afterthought.</p></div>
-        <div class="card reveal"><div class="ico"><svg><use href="#i-flask"/></svg></div><h3>Small, honest steps</h3><p>Each milestone has a written protocol, expected results and limits, and is compared against what actually happened.</p></div>
-        <div class="card reveal"><div class="ico"><svg><use href="#i-cpu"/></svg></div><h3>Runs on modest hardware</h3><p>Everything so far trains and tests on a single 6 GB laptop GPU, with resource gates before anything larger.</p></div>
+      <div class="rq">
+        <div class="reveal"><span class="q">RQ1</span><h3>Can a tokenizer treat Bangla as a first-class script?</h3><p>Many tokenizers split Bangla into far more tokens than English, which wastes context and compute. We build our own byte-level BPE and measure it on both languages.</p></div>
+        <div class="reveal"><span class="q">RQ2</span><h3>Can every part of the stack be verified, not just trusted?</h3><p>Each component is checked against a reference on CPU and GPU before it is used, so later results can be traced to code that is known to be correct.</p></div>
+        <div class="reveal"><span class="q">RQ3</span><h3>How far does one 6 GB consumer GPU go?</h3><p>All work runs on a single RTX 3050. We measure memory, time and stability for each step so scaling decisions rest on numbers, not hope.</p></div>
+        <div class="reveal"><span class="q">RQ4</span><h3>Can training data be clean, traceable and rights-checked?</h3><p>Every text window keeps its source, revision, licence evidence and byte offsets. Nothing enters training until its rights are actually cleared.</p></div>
       </div>
     </div>
   </section>
 
-  <section class="section-alt" id="pipeline">
+  <section class="section-alt" id="method">
     <div class="wrap">
       <div class="section-head reveal">
-        <span class="eyebrow">The pipeline</span>
-        <h2>Five gates, each with its own evidence.</h2>
-        <p>Nothing moves forward on a hunch. A gate closes only when its tests pass and its report is written.</p>
+        <span class="sec-num">§2</span> <span class="eyebrow">Method</span>
+        <h2>Evidence-gated research.</h2>
+        <p>No experiment moves the project forward on a feeling. Each one follows the same five steps, and the next gate opens only when this one has evidence.</p>
       </div>
-      <div class="flow reveal" style="--n:5">
-        <div><h4>D1 · Data and tokenizer</h4><p>Original synthetic fixtures and a dependency-free byte-level BPE tokenizer. 32 tests and 10,000 exact roundtrips.</p></div>
-        <div><h4>C0 · Model correctness</h4><p>A small decoder-only transformer checked shape by shape on CPU and GPU before a single optimizer step.</p></div>
-        <div><h4>T0 · Bounded training</h4><p>120 steps under a predeclared protocol. Finite loss, tiny-batch overfit and a written expected-vs-actual report.</p></div>
-        <div><h4>R2 · Recovery</h4><p>A fresh process reloads a checkpoint and replays 60 steps. The result matches the original run exactly.</p></div>
-        <div><h4>W1 · Real-text audit</h4><p>200 Wikipedia articles, 100 Bangla and 100 English, audited for quality, duplication and length. 82 tests.</p></div>
+      <div class="cycle reveal">
+        <div><b>01</b><h4>Declare</h4><p>Write the protocol, limits and pass thresholds before running anything.</p></div>
+        <div><b>02</b><h4>Bound</h4><p>Cap time, steps, tokens, downloads and memory so a run cannot drift.</p></div>
+        <div><b>03</b><h4>Run</h4><p>Execute once, on fixed seeds and fixed splits, with no tuning on held-out data.</p></div>
+        <div><b>04</b><h4>Compare</h4><p>Record expected versus actual in a table. Targets are never moved afterwards.</p></div>
+        <div><b>05</b><h4>Preserve</h4><p>Hash and keep evidence, so anyone can check exactly what happened.</p></div>
+      </div>
+      <div class="note reveal" style="margin-top:20px"><svg><use href="#i-info"/></svg><p>A passed gate means the engineering works as declared. It is never read as proof of language ability. That needs representative benchmarks, which come later.</p></div>
+    </div>
+  </section>
+
+  <section id="experiments">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§3</span> <span class="eyebrow">Experiments</span>
+        <h2>Six experiments so far.</h2>
+        <p>In the order they ran. Each has a written protocol and a results report in the research repository.</p>
+      </div>
+      <div class="exp-list">
+        <article class="exp reveal">
+          <div class="exp-meta"><div class="id">D1</div><span class="date">10 Oct 2026</span><span class="badge done">Complete</span></div>
+          <div><h3>Data and tokenizer foundation</h3>
+            <p>A dependency-free byte-level BPE tokenizer and 24 original synthetic texts (8 Bangla, 8 English, 8 code) to test the pipeline without any outside data.</p>
+            <dl><dt>checks</dt><dd>32 tests · 10,000 roundtrip probes</dd><dt>vocab</dt><dd>529 active of 4,096 capacity</dd></dl>
+            <span class="result-tag">Every roundtrip exact</span></div>
+        </article>
+        <article class="exp reveal">
+          <div class="exp-meta"><div class="id">C0</div><span class="date">10 Oct 2026</span><span class="badge done">Complete</span></div>
+          <div><h3>Model correctness</h3>
+            <p>A small decoder-only transformer written from scratch and checked layer by layer against an FP32 reference on CPU and GPU, before any training step.</p>
+            <dl><dt>model</dt><dd>1,328,256 params · 4 blocks · width 128 · 4 heads · FFN 352 · context 128</dd><dt>checks</dt><dd>24 new checks + 32 regression tests</dd></dl>
+            <span class="result-tag">Correct against the reference</span></div>
+        </article>
+        <article class="exp reveal">
+          <div class="exp-meta"><div class="id">T0</div><span class="date">10 Oct 2026</span><span class="badge done">Complete</span></div>
+          <div><h3>Bounded training run</h3>
+            <p>The first real training: 120 AdamW steps on the synthetic data with an 18/3/3 split, warmup to a 6e-4 peak and cosine decay. The aim was stability and a learning signal, not quality.</p>
+            <dl><dt>train loss</dt><dd>6.312 → 2.281 (perplexity 551 → 9.8)</dd><dt>overfit</dt><dd>tiny batch 6.268 → 0.506, below the declared 1.0</dd><dt>held-out</dt><dd>validation and test 6.25 → 5.43</dd><dt>cost</dt><dd>300 updates in 9.7 seconds, no NaN or out-of-memory</dd></dl>
+            <span class="result-tag">All declared gates passed</span></div>
+        </article>
+        <article class="exp reveal">
+          <div class="exp-meta"><div class="id">R2</div><span class="date">10 Oct 2026</span><span class="badge done">Complete</span></div>
+          <div><h3>Checkpoint recovery in a fresh process</h3>
+            <p>The step-60 checkpoint was restored in a brand-new Python process and steps 61 to 120 were replayed, to prove a long run can survive a crash.</p>
+            <dl><dt>difference</dt><dd>0 in weights, optimizer, loss, RNG and data cursor</dd><dt>time</dt><dd>6.7 s worker · 9.2 s end to end</dd></dl>
+            <span class="result-tag">Bit-exact replay</span></div>
+        </article>
+        <article class="exp reveal">
+          <div class="exp-meta"><div class="id">W1</div><span class="date">11 Oct 2026</span><span class="badge done">Complete</span></div>
+          <div><h3>Real-text audit: Wikipedia</h3>
+            <p>100 Bangla and 100 English Wikipedia articles from a pinned dump revision, checked for duplicates, split leakage, tokenizer integrity and fit to the model's context.</p>
+            <dl><dt>download</dt><dd>611 MiB of an allowed 1 GiB; 0.24 MiB of text kept</dd><dt>context fit</dt><dd>187 of 200 articles still longer than 128 tokens</dd><dt>rights</dt><dd>0 records cleared for training</dd></dl>
+            <span class="result-tag warn">Audit passed · corpus not yet usable</span></div>
+        </article>
+        <article class="exp reveal">
+          <div class="exp-meta"><div class="id">W2</div><span class="date">11 Oct 2026</span><span class="badge done">Complete</span></div>
+          <div><h3>Cleaning and source windows</h3>
+            <p>70 low-quality articles quarantined. The remaining 130 were cut into 438 windows of at most 128 tokens, each traceable to its exact source bytes.</p>
+            <dl><dt>coverage</dt><dd>130 of 130 articles rebuilt losslessly from windows</dd><dt>mapping</dt><dd>438 of 438 source offsets verified</dd><dt>tests</dt><dd>85 passing, 0 skipped</dd></dl>
+            <span class="result-tag warn">Windows ready · rights still pending</span></div>
+        </article>
       </div>
     </div>
   </section>
 
-  <section>
-    <div class="wrap split">
-      <div class="reveal">
-        <span class="eyebrow">Model card</span>
-        <h3>C0: the reference model.</h3>
-        <p>C0 is deliberately tiny. Its job is not to be clever but to be provably correct, so that every later, larger model can be checked against it.</p>
-        <ul class="checks">
-          <li><svg><use href="#i-check"/></svg>Decoder-only transformer in plain PyTorch</li>
-          <li><svg><use href="#i-check"/></svg>FP32 reference implementation, CPU and GPU</li>
-          <li><svg><use href="#i-check"/></svg>Deterministic runs and exact checkpoint replay</li>
-          <li><svg><use href="#i-check"/></svg>Weights and checkpoints kept local, out of Git</li>
+  <section class="section-alt" id="figures">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§4</span> <span class="eyebrow">Figures</span>
+        <h2>What the numbers show.</h2>
+      </div>
+      <div class="figs">
+        <figure class="reveal">
+          <svg class="chart" viewBox="0 0 420 250" role="img" aria-label="Loss before and after T0 training for train, validation and test splits">
+            <line class="grid" x1="60" y1="20" x2="410" y2="20"/><line class="grid" x1="60" y1="80" x2="410" y2="80"/><line class="grid" x1="60" y1="140" x2="410" y2="140"/><line class="grid" x1="60" y1="200" x2="410" y2="200"/>
+            <text x="50" y="24" text-anchor="end">6.0</text><text x="50" y="84" text-anchor="end">4.0</text><text x="50" y="144" text-anchor="end">2.0</text><text x="50" y="204" text-anchor="end">0</text>
+            <rect class="before" x="82" y="10.6" width="38" height="189.4" rx="4"/><rect class="after" x="124" y="131.6" width="38" height="68.4" rx="4"/>
+            <rect class="before" x="192" y="12.4" width="38" height="187.6" rx="4"/><rect class="after" x="234" y="37" width="38" height="163" rx="4"/>
+            <rect class="before" x="302" y="12.4" width="38" height="187.6" rx="4"/><rect class="after" x="344" y="37" width="38" height="163" rx="4"/>
+            <text class="lbl" x="143" y="125" text-anchor="middle">2.28</text><text class="lbl" x="253" y="31" text-anchor="middle">5.43</text><text class="lbl" x="363" y="31" text-anchor="middle">5.43</text>
+            <text class="lbl" x="122" y="222" text-anchor="middle">train</text><text class="lbl" x="232" y="222" text-anchor="middle">validation</text><text class="lbl" x="342" y="222" text-anchor="middle">test</text>
+            <text x="235" y="244" text-anchor="middle">mean token loss (lower is better)</text>
+          </svg>
+          <div class="legend"><span><i style="background:var(--line)"></i>before</span><span><i style="background:var(--accent)"></i>after 120 steps</span></div>
+          <figcaption><b>Figure 1.</b> T0 loss before and after training. The model learns its training texts well, but held-out loss barely moves. With 18 tiny training texts this gap is expected: it is memorising, which is exactly what this stage was meant to confirm before real data.</figcaption>
+        </figure>
+        <figure class="reveal">
+          <svg class="chart" viewBox="0 0 420 256" role="img" aria-label="Share of texts that fit the 128-token context across W1 and W2">
+            <line class="grid" x1="60" y1="20" x2="410" y2="20"/><line class="grid" x1="60" y1="110" x2="410" y2="110"/><line class="grid" x1="60" y1="200" x2="410" y2="200"/>
+            <text x="50" y="24" text-anchor="end">100%</text><text x="50" y="114" text-anchor="end">50%</text><text x="50" y="204" text-anchor="end">0%</text>
+            <rect class="before" x="90" y="200" width="60" height="0.01" rx="3"/><rect x="90" y="198" width="60" height="2" rx="1" fill="#e09a0c"/>
+            <rect class="after2" x="190" y="188.3" width="60" height="11.7" rx="4"/>
+            <rect class="after" x="290" y="20" width="60" height="180" rx="4"/>
+            <text class="lbl" x="120" y="190" text-anchor="middle">0%</text><text class="lbl" x="220" y="180" text-anchor="middle">6.5%</text><text class="lbl" x="320" y="14" text-anchor="middle">100%</text>
+            <text class="lbl" x="120" y="218" text-anchor="middle">W1</text><text x="120" y="231" text-anchor="middle">first tok.</text><text class="lbl" x="220" y="218" text-anchor="middle">W1</text><text x="220" y="231" text-anchor="middle">pilot tok.</text><text class="lbl" x="320" y="218" text-anchor="middle">W2</text><text x="320" y="231" text-anchor="middle">windows</text>
+            <text x="235" y="248" text-anchor="middle">texts that fit in 128 tokens</text>
+          </svg>
+          <div class="legend"><span><i style="background:var(--accent-2)"></i>articles</span><span><i style="background:var(--accent)"></i>source windows</span></div>
+          <figcaption><b>Figure 2.</b> Fitting real text into a 128-token context. With the first tokenizer no article fit; a pilot tokenizer got 13 of 200 in. W2 solved it by cutting articles into 438 traceable windows, at the cost of context across window edges.</figcaption>
+        </figure>
+      </div>
+
+      <div class="tbl-wrap reveal" style="margin-top:20px">
+        <table class="tbl">
+          <caption class="sr-only" style="position:absolute;left:-9999px">Table 1: T0 results by split</caption>
+          <thead><tr><th>Table 1 · T0 by split</th><th class="num">texts</th><th class="num">tokens</th><th class="num">loss before</th><th class="num">loss after</th><th class="num">perplexity after</th></tr></thead>
+          <tbody>
+            <tr><td>Train</td><td class="num">18</td><td class="num">878</td><td class="num">6.312</td><td class="num">2.281</td><td class="num">9.78</td></tr>
+            <tr><td>Validation</td><td class="num">3</td><td class="num">283</td><td class="num">6.252</td><td class="num">5.434</td><td class="num">229.05</td></tr>
+            <tr><td>Test</td><td class="num">3</td><td class="num">225</td><td class="num">6.254</td><td class="num">5.434</td><td class="num">229.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="findings">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§5</span> <span class="eyebrow">Findings</span>
+        <h2>What we learned.</h2>
+      </div>
+      <div class="two-col">
+        <div class="findings">
+          <div class="finding reveal"><div><h4>The from-scratch stack is sound</h4><p>Tokenizer, model and optimizer are verified, numerically stable on a 6 GB GPU, and reproducible to the last bit.</p></div></div>
+          <div class="finding reveal"><div><h4>Synthetic data has done its job</h4><p>It proved the pipeline learns. It cannot teach language, so held-out quality now depends entirely on real data.</p></div></div>
+          <div class="finding reveal"><div><h4>Context, not compute, is the first wall</h4><p>Almost no real article fits in 128 tokens. Windowing works today; a longer context and a tokenizer tuned for Bangla are the real fix.</p></div></div>
+          <div class="finding reveal"><div><h4>Rights are the slowest gate</h4><p>Licence evidence is recorded for every article, but page-history and imported-text exceptions still block training use. We will not skip this.</p></div></div>
+        </div>
+        <div>
+          <div class="tbl-wrap reveal">
+            <table class="tbl">
+              <thead><tr><th>Table 2 · C0 model card</th><th>value</th></tr></thead>
+              <tbody>
+                <tr><td>Architecture</td><td>decoder-only transformer</td></tr>
+                <tr><td>Parameters</td><td class="mono">1,328,256</td></tr>
+                <tr><td>Blocks · width · heads</td><td class="mono">4 · 128 · 4</td></tr>
+                <tr><td>FFN width · context</td><td class="mono">352 · 128</td></tr>
+                <tr><td>Tokenizer</td><td>byte-level BPE, own code</td></tr>
+                <tr><td>Precision</td><td>FP32, eager attention</td></tr>
+                <tr><td>Optimizer</td><td>AdamW (0.9, 0.95), decay 0.1</td></tr>
+                <tr><td>Hardware</td><td>one RTX 3050 6 GB, Windows</td></tr>
+                <tr><td>Stack</td><td class="mono">Python 3.13 · PyTorch 2.13 · CUDA 12.6</td></tr>
+                <tr><td>Release status</td><td><span class="open">research only</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-alt" id="limits">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§6</span> <span class="eyebrow">Limits and open gates</span>
+        <h2>What these results do not show.</h2>
+        <p>Said plainly, so the numbers above are not read as more than they are.</p>
+      </div>
+      <div class="two-col">
+        <ul class="limits">
+          <li class="reveal"><svg><use href="#i-info"/></svg>No benchmark of real Bangla, English or code ability has been run yet.</li>
+          <li class="reveal"><svg><use href="#i-info"/></svg>Held-out sets are tiny (3 texts in T0), so generalisation cannot be judged.</li>
+          <li class="reveal"><svg><use href="#i-info"/></svg>The 30-minute sustained GPU and memory test was paused at 5.5 minutes and is not passed.</li>
+        </ul>
+        <ul class="limits">
+          <li class="reveal"><svg><use href="#i-info"/></svg>No Wikipedia text is cleared for training; W1 and W2 are audit-only.</li>
+          <li class="reveal"><svg><use href="#i-info"/></svg>Windows have no overlap, so meaning across window edges is lost.</li>
+          <li class="reveal"><svg><use href="#i-info"/></svg>Trained weights stay private and local. No model is released.</li>
         </ul>
       </div>
-      <table class="model reveal" aria-label="C0 model configuration">
-        <tr><td>Parameters</td><td>1,328,256</td></tr>
-        <tr><td>Transformer blocks</td><td>4</td></tr>
-        <tr><td>Model width</td><td>128</td></tr>
-        <tr><td>Attention heads</td><td>4</td></tr>
-        <tr><td>Feed-forward width</td><td>352</td></tr>
-        <tr><td>Context length</td><td>128 tokens</td></tr>
-        <tr><td>Tokenizer</td><td>byte-level BPE</td></tr>
-        <tr><td>Hardware</td><td>RTX 3050 6 GB</td></tr>
-      </table>
     </div>
   </section>
 
-  <section class="section-alt" id="results">
+  <section id="next">
     <div class="wrap">
       <div class="section-head reveal">
-        <span class="eyebrow">Results so far</span>
-        <h2>The loop learns, and it can be trusted.</h2>
-        <p>The T0 run proves the training loop works end to end on a tiny synthetic set. It does not prove the model knows anything useful yet, and the report says so.</p>
-      </div>
-      <div class="results">
-        <div class="bars reveal" role="img" aria-label="Train loss fell from 6.312 to 2.281; tiny-batch loss fell from 6.268 to 0.506; perplexity fell from 551 to 9.78">
-          <div class="bar-row"><h4>Train loss, 120 steps</h4>
-            <div class="bar"><span>start</span><i style="width:100%"></i><b>6.312</b></div>
-            <div class="bar"><span>end</span><i class="after" style="width:36%"></i><b>2.281</b></div></div>
-          <div class="bar-row"><h4>Tiny-batch overfit check</h4>
-            <div class="bar"><span>start</span><i style="width:99%"></i><b>6.268</b></div>
-            <div class="bar"><span>end</span><i class="after" style="width:8%"></i><b>0.506</b></div></div>
-          <div class="bar-row"><h4>Perplexity</h4>
-            <div class="bar"><span>start</span><i style="width:100%"></i><b>551</b></div>
-            <div class="bar"><span>end</span><i class="after" style="width:2%"></i><b>9.78</b></div></div>
-        </div>
-        <div class="grid g2" style="gap:14px">
-          <div class="card reveal"><div class="ico"><svg><use href="#i-refresh"/></svg></div><h3>Exact replay</h3><p>A checkpoint resumed in a fresh process reproduces the original run with zero difference.</p></div>
-          <div class="card reveal"><div class="ico"><svg><use href="#i-zap"/></svg></div><h3>Fast iteration</h3><p>300 optimizer updates finish in under ten seconds on a laptop GPU.</p></div>
-          <div class="card reveal"><div class="ico"><svg><use href="#i-eye"/></svg></div><h3>Real text, measured</h3><p>The W1 audit found 187 of 200 articles exceed a 128-token context, so chunking comes next.</p></div>
-          <div class="card reveal"><div class="ico"><svg><use href="#i-shield"/></svg></div><h3>Rights before data</h3><p>No large corpus is used until its licence and provenance are reviewed and recorded.</p></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
-      <div class="section-head reveal">
-        <span class="eyebrow">Principles</span>
-        <h2>How the work is done.</h2>
-      </div>
-      <div class="principles">
-        <div class="principle reveal"><div class="ico"><svg><use href="#i-book"/></svg></div><div><h4>Write it down first</h4><p>Each run has a protocol before it starts and a results report after, in Bangla and English.</p></div></div>
-        <div class="principle reveal"><div class="ico"><svg><use href="#i-scale"/></svg></div><div><h4>No overclaiming</h4><p>Results state their limits. A passing test on synthetic data is reported as exactly that.</p></div></div>
-        <div class="principle reveal"><div class="ico"><svg><use href="#i-lock"/></svg></div><div><h4>Private by default</h4><p>Datasets, weights and checkpoints stay local and out of version control.</p></div></div>
-        <div class="principle reveal"><div class="ico"><svg><use href="#i-wallet"/></svg></div><div><h4>Spend only with approval</h4><p>New downloads, cloud compute or longer training each need a separate sign-off.</p></div></div>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-alt" id="roadmap">
-    <div class="wrap">
-      <div class="section-head reveal">
-        <span class="eyebrow">Roadmap</span>
-        <h2>Where it stands today.</h2>
+        <span class="sec-num">§7</span> <span class="eyebrow">Next</span>
+        <h2>The next research gates.</h2>
       </div>
       <div class="timeline">
-        <div class="tl reveal"><span class="phase">D1</span><div><h4>Data and tokenizer foundation</h4><p>Synthetic fixtures, byte-level BPE, 32 tests and 10,000 roundtrip probes.</p></div><span class="badge done">Done</span></div>
-        <div class="tl reveal"><span class="phase">C0</span><div><h4>Model correctness</h4><p>1.33M-parameter reference transformer verified on CPU and GPU.</p></div><span class="badge done">Done</span></div>
-        <div class="tl reveal"><span class="phase">T0 · R2</span><div><h4>Bounded training and recovery</h4><p>120-step training run and exact checkpoint replay in a fresh process.</p></div><span class="badge done">Done</span></div>
-        <div class="tl reveal"><span class="phase">W1</span><div><h4>Real corpus readiness</h4><p>Wikipedia audit done. Rights review, stronger cleaning, deduplication and context chunking remain.</p></div><span class="badge wip">In progress</span></div>
-        <div class="tl reveal"><span class="phase">Gate</span><div><h4>Sustained resource test</h4><p>Prove a 30-minute workload fits the hardware before scaling the model.</p></div><span class="badge plan">Next</span></div>
-        <div class="tl reveal"><span class="phase">Later</span><div><h4>Assistant features</h4><p>Chat backend, memory, retrieval, tools and security integration.</p></div><span class="badge plan">Planned</span></div>
+        <div class="tl reveal"><span class="phase">Gate · S1</span><div><h4>Sustained resource test</h4><p>Finish the 30-minute GPU and memory run before any larger model. The first attempt was paused at 5.5 minutes.</p></div><span class="badge wip">Paused</span></div>
+        <div class="tl reveal"><span class="phase">Data · W3</span><div><h4>Rights-cleared corpus</h4><p>Record-level licence clearance, stronger deduplication and representative held-out sets.</p></div><span class="badge plan">Next</span></div>
+        <div class="tl reveal"><span class="phase">Tokenizer</span><div><h4>Bangla-tuned tokenizer</h4><p>Fit and qualify a production tokenizer and compare token efficiency for Bangla and English.</p></div><span class="badge plan">Planned</span></div>
+        <div class="tl reveal"><span class="phase">Model · C1</span><div><h4>Larger model, longer context</h4><p>Scale the verified design within what one GPU can sustain, then run real benchmarks.</p></div><span class="badge plan">Planned</span></div>
+        <div class="tl reveal"><span class="phase">Later</span><div><h4>Assistant features</h4><p>Chat, memory, retrieval and tools, built on the model once it earns them.</p></div><span class="badge plan">Later</span></div>
       </div>
-      <div class="note reveal" style="margin-top:20px"><svg><use href="#i-info"/></svg><p>CogNova 3.0 is a research project. It is not a product yet and no production model capability is claimed. The numbers above come from small, bounded experiments.</p></div>
+
+      <div class="cite reveal" style="margin-top:40px">
+        <div class="section-head" style="margin-bottom:16px"><span class="eyebrow">Cite this work</span></div>
+        <div style="position:relative"><button class="copy" type="button" id="copyCite">Copy</button>
+<pre id="citeText"><span class="k">@misc</span>{ahmed2026cognova,
+  <span class="k">title</span>  = {<span class="s">CogNova 3.0: Building a Bangla-first Language Model from the First Byte</span>},
+  <span class="k">author</span> = {<span class="s">Ahmed, Sifat</span>},
+  <span class="k">year</span>   = {<span class="s">2026</span>},
+  <span class="k">note</span>   = {<span class="s">SyncAura Research, research report (alpha)</span>},
+  <span class="k">url</span>    = {<span class="s">https://cognova.sifat.codes</span>}
+}</pre></div>
+      </div>
     </div>
   </section>
 
-  <div class="wrap" style="padding-top:72px;padding-bottom:40px">
+  <div class="wrap" style="padding-top:40px;padding-bottom:40px">
     <div class="cta reveal">
-      <h2>Interested in Bangla AI research?</h2>
-      <p>The repository is private while the foundation is built. Reach out to talk about the work, data partnerships or collaboration.</p>
+      <h2>Working on Bangla AI?</h2>
+      <p>The research repository is private while the foundation is built. Get in touch about the work, data partnerships or collaboration.</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="mailto:hello@sifat.email?subject=CogNova%203.0"><svg><use href="#i-mail"/></svg>hello@sifat.email</a>
         <a class="btn btn-ghost" href="https://syncaura.site">About SyncAura <svg><use href="#i-arrow"/></svg></a>
@@ -287,11 +453,19 @@
 
 <footer>
   <div class="wrap">
-    <span>© <span id="year">2026</span> CogNova · a SyncAura project · built by <a href="https://sifat.email">Sifat Ahmed</a></span>
+    <span>© <span id="year">2026</span> CogNova · SyncAura Research · by <a href="https://sifat.email">Sifat Ahmed</a></span>
     <nav class="foot-links" aria-label="Other projects">
-      <a href="https://syncaura.site">SyncAura</a><a href="https://agent.sifat.cloud">SI Agent</a><a href="https://mail.sifat.codes">Cognova Mail</a><a href="https://framenest.sifat.codes">FrameNest</a><a href="https://bos.sifat.codes">BOS</a><a href="https://sifat.cloud">Sifat.cloud</a>
+      <a href="https://syncaura.site">SyncAura</a><a href="https://agent.sifat.cloud">SI Agent</a><a href="https://mail.sifat.codes">Cognova Mail</a><a href="https://framenest.sifat.codes">FrameNest</a><a href="https://bos.sifat.codes">BOS</a><a href="https://about.sifat.cloud">Sifat.cloud</a>
     </nav>
   </div>
 </footer>
+<script>
+  document.getElementById('copyCite').addEventListener('click', function () {
+    var b = this;
+    navigator.clipboard.writeText(document.getElementById('citeText').textContent).then(function () {
+      b.textContent = 'Copied'; setTimeout(function () { b.textContent = 'Copy'; }, 1600);
+    });
+  });
+</script>
 </body>
 </html>
