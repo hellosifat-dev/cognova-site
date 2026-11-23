@@ -91,6 +91,7 @@
   .tbl th, .tbl td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--line-2); white-space: nowrap; }
   .tbl th { font: 500 12px var(--mono); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; background: var(--bg-2); }
   .tbl tr:last-child td { border-bottom: 0; }
+  .tbl.card th, .tbl.card td { white-space: normal; }
   .tbl td.num { font-family: var(--mono); font-size: 13.5px; text-align: right; }
   .tbl th.num { text-align: right; }
   .pass { color: #17804f; font-weight: 600; } :root[data-theme="dark"] .pass { color: #4ade80; }
@@ -182,6 +183,7 @@
       <a href="#method">Method</a>
       <a href="#experiments">Experiments</a>
       <a href="#findings">Findings</a>
+      <a href="#cognova-8">8.0 · 9.0</a>
       <a href="#next">Next</a>
     </nav>
     <div class="nav-end">
@@ -195,7 +197,7 @@
 <main id="main">
   <div class="wrap" id="top">
     <div class="paper-hero">
-      <span class="pill reveal"><span class="dot"></span>Research report · alpha · updated October 2026</span>
+      <span class="pill reveal"><span class="dot"></span>Research report · alpha · updated November 2026</span>
       <h1 class="reveal">Building a Bangla-first language model <em>from the first byte</em></h1>
       <div class="byline reveal"><span><b>Sifat Ahmed</b></span><span>SyncAura Research</span><span>Dhaka, Bangladesh</span><span>Started 10 October 2026</span></div>
       <div class="abstract reveal">
@@ -203,7 +205,7 @@
         <p>CogNova 3.0 asks whether a small team, on one consumer graphics card, can build a useful language model for Bangla, English and code without starting from someone else's weights. We write the tokenizer, the transformer and the training loop ourselves, and treat every step as an experiment: the expected result is written down first, the run is bounded, and the actual result is recorded next to it, including when it falls short. Six experiments are complete. A 1.33M-parameter reference model trains stably, overfits a tiny batch on purpose, and resumes from a checkpoint with zero numerical difference. Our audit of real Wikipedia text showed what the next model needs: context chunking, stronger cleaning and record-level rights clearance before any real training starts.</p>
       </div>
       <div class="keywords reveal"><span>language modelling</span><span>Bangla NLP</span><span>byte-level BPE</span><span>transformers</span><span>reproducibility</span><span>data provenance</span></div>
-      <nav class="toc reveal" aria-label="Contents"><a href="#questions"><b>1</b>Research questions</a><a href="#method"><b>2</b>Method</a><a href="#experiments"><b>3</b>Experiments</a><a href="#figures"><b>4</b>Figures</a><a href="#findings"><b>5</b>Findings</a><a href="#limits"><b>6</b>Limits</a><a href="#next"><b>7</b>Next</a></nav>
+      <nav class="toc reveal" aria-label="Contents"><a href="#questions"><b>1</b>Research questions</a><a href="#method"><b>2</b>Method</a><a href="#experiments"><b>3</b>Experiments</a><a href="#figures"><b>4</b>Figures</a><a href="#findings"><b>5</b>Findings</a><a href="#limits"><b>6</b>Limits</a><a href="#cognova-8"><b>7</b>CogNova 8.0</a><a href="#cognova-9"><b>8</b>CogNova 9.0</a><a href="#cognova-media"><b>9</b>Media 1.0</a><a href="#next"><b>10</b>Next</a></nav>
     </div>
 
     <div class="stats reveal" style="margin-bottom:24px">
@@ -411,10 +413,112 @@
     </div>
   </section>
 
-  <section id="next">
+  <section id="cognova-8">
     <div class="wrap">
       <div class="section-head reveal">
-        <span class="sec-num">§7</span> <span class="eyebrow">Next</span>
+        <span class="sec-num">§7</span> <span class="eyebrow">CogNova 8.0</span>
+        <h2>The quick one.</h2>
+        <p>CogNova 3.0 is trained from the first byte, which takes time. SI Agent needs models that work today, so the family has a second track: models built on an open-weight base, with our own identity, rules and settings on top, and measured the same way as the research. The number is our version, not a parameter count: 8.0 sits on a much larger base than 3.0. Released 23 November 2026.</p>
+      </div>
+      <div class="two-col">
+        <div class="findings">
+          <div class="finding reveal"><div><h4>Built for speed</h4><p>Short questions, voice turns, anything that should answer at once. A spoken answer has to start before the person wonders whether the app heard them.</p></div></div>
+          <div class="finding reveal"><div><h4>Clean on behaviour</h4><p>Passed every case in the last run: says what it is in Bangla, English and Hindi, answers in the language and script it was asked in, stays short, admits what it cannot know.</p></div></div>
+          <div class="finding reveal"><div><h4>Weak on facts</h4><p>A small model states a wrong date or price with the same calm as a right one. The suite tests behaviour, not knowledge, so use 9.0 for anything that matters and check any number.</p></div></div>
+        </div>
+        <div>
+          <div class="tbl-wrap reveal">
+            <table class="tbl card">
+              <thead><tr><th>Table 3 · 8.0 model card</th><th>value</th></tr></thead>
+              <tbody>
+                <tr><td>Track</td><td>open-weight base, own identity and rules</td></tr>
+                <tr><td>Download · memory</td><td>2.3 GB · about 4 GB</td></tr>
+                <tr><td>Sampling</td><td class="mono">temperature 0.6 · top_p 0.9 · top_k 40</td></tr>
+                <tr><td>Identity · language</td><td class="mono">9/9 · 12/12</td></tr>
+                <tr><td>Brevity · honesty</td><td class="mono">6/6 · 9/9</td></tr>
+                <tr><td>Writing speed</td><td class="mono">49.6 tok/s · loads in 4 s</td></tr>
+                <tr><td>Languages</td><td>Bangla, English, Hindi</td></tr>
+                <tr><td>Release status</td><td><span class="open">runs locally in SI Agent</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-alt" id="cognova-9">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§8</span> <span class="eyebrow">CogNova 9.0</span>
+        <h2>The careful one.</h2>
+        <p>The everyday chat model in SI Agent: longer answers, better Bangla, and work where being right matters more than being instant. Same track as 8.0, on a larger base. Released 23 November 2026.</p>
+      </div>
+      <div class="two-col">
+        <div class="findings">
+          <div class="finding reveal"><div><h4>Better language, slower answers</h4><p>Its Bangla and its explanations are clearly better than 8.0’s. It writes about four times slower, but still answers in a few seconds on a 6 GB graphics card.</p></div></div>
+          <div class="finding reveal"><div><h4>Reasoning switched off, on purpose</h4><p>With step-by-step reasoning on it took about 130 seconds for a one-line answer. Off, it answers directly. For a problem that needs real steps, ask for them.</p></div></div>
+          <div class="finding reveal"><div><h4>One standing fault, cosmetic</h4><p>Asked "তুমি কে?" it writes its own name in Bangla letters, every round. Four prompt fixes were tried and measured; the plain positive rule did least harm.</p></div></div>
+        </div>
+        <div>
+          <div class="tbl-wrap reveal">
+            <table class="tbl card">
+              <thead><tr><th>Table 4 · 9.0 model card</th><th>value</th></tr></thead>
+              <tbody>
+                <tr><td>Track</td><td>open-weight base, own identity and rules</td></tr>
+                <tr><td>Download · memory</td><td>6.1 GB · about 8 GB</td></tr>
+                <tr><td>Sampling</td><td class="mono">temperature 0.7 · top_p 0.9 · top_k 40</td></tr>
+                <tr><td>Identity · language</td><td class="mono">6/9 · 12/12</td></tr>
+                <tr><td>Brevity · honesty</td><td class="mono">6/6 · 9/9</td></tr>
+                <tr><td>Writing speed</td><td class="mono">13.2 tok/s · loads in 10 s</td></tr>
+                <tr><td>Languages</td><td>Bangla, English, Hindi</td></tr>
+                <tr><td>Release status</td><td><span class="open">runs locally in SI Agent</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cognova-media">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§9</span> <span class="eyebrow">CogNova Media 1.0</span>
+        <h2>The one that reads pictures.</h2>
+        <p>A model for one job: look at a picture the person attached and report what is in it, including its text, before a chat model answers. Same track, numbered by its job. Released 23 November 2026.</p>
+      </div>
+      <div class="two-col">
+        <div class="findings">
+          <div class="finding reveal"><div><h4>Copies text exactly</h4><p>On the suite’s receipt every round, asked in Bangla and in English, returned all eight known strings, including চালের দাম, ৭২ and ঢাকা, and invented no number.</p></div></div>
+          <div class="finding reveal"><div><h4>Never guesses</h4><p>Temperature 0, because a model that copies text must not get creative. A blurred digit is reported as "unclear", and it never answers the question in the picture’s place.</p></div></div>
+          <div class="finding reveal"><div><h4>Clean print only, so far</h4><p>The test picture is rendered text, the easy case. Handwriting, low light, angled photos and faint scans are untested, and Bangla letters are where it slips first.</p></div></div>
+        </div>
+        <div>
+          <div class="tbl-wrap reveal">
+            <table class="tbl card">
+              <thead><tr><th>Table 5 · Media 1.0 card</th><th>value</th></tr></thead>
+              <tbody>
+                <tr><td>Track</td><td>open-weight vision base, own rules</td></tr>
+                <tr><td>Download · memory</td><td>3.0 GB · about 5 GB</td></tr>
+                <tr><td>Sampling</td><td class="mono">temperature 0 · top_p 0.9</td></tr>
+                <tr><td>Picture rounds</td><td class="mono">6/6 · 8 of 8 strings</td></tr>
+                <tr><td>Identity</td><td class="mono">1/2 (answers in English)</td></tr>
+                <tr><td>Writing speed</td><td class="mono">68.6 tok/s · loads in 8 s</td></tr>
+                <tr><td>Scripts read</td><td>Bangla, English</td></tr>
+                <tr><td>Release status</td><td><span class="open">runs locally in SI Agent</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-alt" id="next">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="sec-num">§10</span> <span class="eyebrow">Next</span>
         <h2>The next research gates.</h2>
       </div>
       <div class="timeline">
